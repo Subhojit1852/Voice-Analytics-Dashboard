@@ -27,7 +27,7 @@ export default function Footer() {
         </Typography>
 
         <Link
-          href="https://github.com/Subhojit1852"
+          href="https://github.com/Subhojit1852/Voice-Analytics-Dashboard"
           target="_blank"
           rel="noopener"
           underline="none"
@@ -68,3 +68,4 @@ export default function Footer() {
     </Box>
   );
 }
+
