@@ -5,6 +5,7 @@ import {
   Button,
   TextField,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import {
   LineChart,
@@ -14,28 +15,59 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmailModal from "../components/EmailModal";
-import { supabase } from "../lib/supabase";
 import OverwriteModal from "../components/OverwriteModal";
+import { supabase } from "../lib/supabase";
 
+type EditRow = {
+  day: string;
+  calls: string; // 👈 string, not number
+};
 const defaultData = [
-  { day: "Mon", calls: 120 },
-  { day: "Tue", calls: 200 },
-  { day: "Wed", calls: 150 },
-  { day: "Thu", calls: 280 },
-  { day: "Fri", calls: 220 },
+  { day: "Mon", calls: "120" },
+  { day: "Tue", calls: "200" },
+  { day: "Wed", calls: "150" },
+  { day: "Thu", calls: "280" },
+  { day: "Fri", calls: "220" },
 ];
 
 export default function CallVolumeChart() {
-  const [data, setData] = useState(defaultData);
-  const [editData, setEditData] = useState(defaultData);
+  const [data, setData] = useState<any[] | null>(null);
+
+
+const [editData, setEditData] = useState<EditRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [emailModal, setEmailModal] = useState(false);
   const [overwriteModal, setOverwriteModal] = useState(false);
 
   const [email, setEmail] = useState("");
   const [existingData, setExistingData] = useState<any>(null);
+
+  // 🔥 FETCH DATA ON PAGE LOAD
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from("analytics_data")
+        .select("chart_data")
+        .limit(1)
+        .single();
+
+      if (!error && data?.chart_data) {
+        setData(data.chart_data);
+        setEditData(data.chart_data);
+      } else {
+        // fallback only if DB is empty
+        setData(defaultData);
+        setEditData(defaultData);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
 
   const handleEmailSubmit = async (email: string) => {
     setEmail(email);
@@ -61,9 +93,20 @@ export default function CallVolumeChart() {
       chart_data: editData,
     });
 
+    // sync UI with saved data
     setData(editData);
     setOverwriteModal(false);
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent>
+          <CircularProgress />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -73,7 +116,7 @@ export default function CallVolumeChart() {
         </Typography>
 
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <LineChart data={data ?? []}>
             <XAxis dataKey="day" />
             <YAxis />
             <Tooltip />
@@ -94,12 +137,11 @@ export default function CallVolumeChart() {
               type="number"
               size="small"
               value={item.calls}
-             onChange={(e) => {
-  const value = Number(e.target.value);
-
-  setEditData((prev) =>
-    prev.map((item, i) =>
-      i === idx ? { ...item, calls: value } : item
+            onChange={(e) => {
+  const value = e.target.value; // keep as string
+  setEditData(prev =>
+    prev.map((row, i) =>
+      i === idx ? { ...row, calls: value } : row
     )
   );
 }}
