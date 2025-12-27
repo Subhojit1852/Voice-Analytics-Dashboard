@@ -17,14 +17,14 @@ The application visualizes call analytics data and allows users to customize cha
 
 ## 🔗 Links
 - **Live Demo:** https://<your-vercel-url>
-- **GitHub Repo:** https://github.com/<your-username>/<repo-name>
+- **GitHub Repo:** https://github.com/Subhojit1852/Voice-Analytics-Dashboard
 
 ---
 
 ## 👤 Author
 **Subhojit Ganguly**  
 📧 Email: [subhojitganguly2@gmail.com](mailto:subhojitganguly2@gmail.com)  
-🐙 GitHub: https://github.com/<your-username>
+🐙 GitHub: [[https://github.com/<your-username>]](https://github.com/Subhojit1852)
 
 ---
 
